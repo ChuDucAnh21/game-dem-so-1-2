@@ -8,7 +8,8 @@ import { QUANTITY_SOUNDS,QUANTITY_IMAGES } from '../assets/quantityAssets';
 export class QuantityScene extends Phaser.Scene {
     private audio!: HowlerAudioManager;
     // brush cho tô
-    private brushRadius = 14; // to hơn cho dễ tô tròn
+    private brushRadius = 24; // to hơn cho dễ tô tròn
+    
     private brushColor = 0x1b9cff; // xanh dương cho bé
     private fillThreshold = 0.6; // 60% là đạt (dễ thở hơn)
     private paintGridSize = 10; // lưới 16x16 điểm mẫu cho mỗi vòng
