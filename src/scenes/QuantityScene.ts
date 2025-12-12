@@ -15,7 +15,6 @@ export class QuantityScene extends Phaser.Scene {
 
     private currentLevelIndex = 0;
     private levels: CountLevel[] = [];
-    private readonly LEVELS_PER_GAME = 2;
 
     private score = 0;
 
@@ -31,7 +30,7 @@ export class QuantityScene extends Phaser.Scene {
     };
 
     // UI
-    private titleText!: Phaser.GameObjects.Text;
+    // private titleText!: Phaser.GameObjects.Text;
     private doneButton!: Phaser.GameObjects.Container;
     private titleBanner!: Phaser.GameObjects.Image;
     // ✅ icon check đúng/sai
@@ -47,7 +46,6 @@ export class QuantityScene extends Phaser.Scene {
     // 👉 hint tô
     private hintFinger?: Phaser.GameObjects.Image;
     private hintPaint?: Phaser.GameObjects.Graphics;
-    private hintCircle?: Phaser.GameObjects.Image;
 
     // chỉ cần phân biệt đang trong game hay đã end
     // playing: đang làm
@@ -102,9 +100,6 @@ export class QuantityScene extends Phaser.Scene {
     }
     // Tạo hint: vệt tô mờ + ngón tay trên 1 vòng tròn
     private showPaintHintForCircle(circle: Phaser.GameObjects.Image) {
-        // lưu lại circle để check trong paintInCircle
-        this.hintCircle = circle;
-
         // vệt tô mờ
         const hintPaint = this.add.graphics().setDepth(4).setAlpha(0.4);
         const radius = (circle.displayWidth / 2) * 0.7;
@@ -156,7 +151,6 @@ export class QuantityScene extends Phaser.Scene {
             this.hintFinger.destroy();
             this.hintFinger = undefined;
         }
-        this.hintCircle = undefined;
     }
 
     // ========= Preload =========
@@ -230,7 +224,7 @@ export class QuantityScene extends Phaser.Scene {
             .setDepth(900); // dưới text, trên background
 
         // Text nằm TRONG panel_title, trùng tâm với banner
-        this.titleText = this.add
+        this.add
             .text(
                 this.titleBanner.x,
                 this.titleBanner.y,
@@ -349,7 +343,7 @@ export class QuantityScene extends Phaser.Scene {
         showGameButtons();
     }
 
-    private updateObjectsPanel(level: CountLevel) {
+    private updateObjectsPanel() {
         const centerX = this.pctX(0.5);
         const centerY = this.pctY(0.4);
 
@@ -433,7 +427,7 @@ export class QuantityScene extends Phaser.Scene {
         this.setBackgroundForIcon(level.objectIcon);
 
         // 🔥 vẽ panel theo số lượng vật của level
-        this.updateObjectsPanel(level);
+        this.updateObjectsPanel();
 
         this.drawObjects(level);
         this.drawCircles(level);
@@ -636,11 +630,6 @@ export class QuantityScene extends Phaser.Scene {
         onComplete?: () => void
     ) {
         const targets: any[] = [sprite];
-        const spriteAny = sprite as any;
-
-        const baseScaleX = spriteAny.baseScaleX || sprite.scaleX;
-        const baseScaleY = spriteAny.baseScaleY || sprite.scaleY;
-
         if (label) {
             targets.push(label);
         }
@@ -821,31 +810,31 @@ export class QuantityScene extends Phaser.Scene {
         return ratio;
     }
 
-    private onCircleClicked(circle: Phaser.GameObjects.Image) {
-        if (this.state === 'result') return;
+    // private onCircleClicked(circle: Phaser.GameObjects.Image) {
+    //     if (this.state === 'result') return;
 
-        this.audio.play('sfx-click');
+    //     this.audio.play('sfx-click');
 
-        const filled = circle.getData('filled') as boolean;
-        const newFilled = !filled;
-        circle.setData('filled', newFilled);
+    //     const filled = circle.getData('filled') as boolean;
+    //     const newFilled = !filled;
+    //     circle.setData('filled', newFilled);
 
-        const baseScaleX = (circle as any).baseScaleX || circle.scaleX;
-        const baseScaleY = (circle as any).baseScaleY || circle.scaleY;
+    //     const baseScaleX = (circle as any).baseScaleX || circle.scaleX;
+    //     const baseScaleY = (circle as any).baseScaleY || circle.scaleY;
 
-        circle.setTexture(newFilled ? 'circle_filled' : 'circle_empty');
+    //     circle.setTexture(newFilled ? 'circle_filled' : 'circle_empty');
 
-        const targetScaleX = newFilled ? baseScaleX * 1.2 : baseScaleX;
-        const targetScaleY = newFilled ? baseScaleY * 1.2 : baseScaleY;
+    //     const targetScaleX = newFilled ? baseScaleX * 1.2 : baseScaleX;
+    //     const targetScaleY = newFilled ? baseScaleY * 1.2 : baseScaleY;
 
-        this.tweens.add({
-            targets: circle,
-            scaleX: targetScaleX,
-            scaleY: targetScaleY,
-            duration: 120,
-            ease: 'Back.out',
-        });
-    }
+    //     this.tweens.add({
+    //         targets: circle,
+    //         scaleX: targetScaleX,
+    //         scaleY: targetScaleY,
+    //         duration: 120,
+    //         ease: 'Back.out',
+    //     });
+    // }
 
     private animateLevelIntro() {
         const allTargets: Phaser.GameObjects.Image[] = [
