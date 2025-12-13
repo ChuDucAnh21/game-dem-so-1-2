@@ -22,7 +22,7 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: [QuantityScene, EndGameScene],
     scale: {
         mode: Phaser.Scale.FIT, // Canvas tự fit vào container
-        autoCenter: Phaser.Scale.CENTER_BOTH,
+        autoCenter: Phaser.Scale.NO_CENTER,
         zoom: DPR, 
     },
     render: {
@@ -101,6 +101,7 @@ window.addEventListener('orientationchange', updateUIButtonScale);
 document.getElementById('btn-reset')?.addEventListener('click', () => {
     window.compareScene?.restartGame();
 });
+
 
 
 

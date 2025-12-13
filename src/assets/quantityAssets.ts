@@ -58,5 +58,5 @@ export const QUANTITY_SOUNDS: Record<string, HowlerSoundDef> = {
   //khác
   "voice_try_again": { src: "assets/audio/prompt/retry_draw.mp3", volume: 1.0 , html5: true},
 
-   "bgm_quantity": { src: "assets/audio/bg/music_bg.mp3", loop: true, volume: 0.2, html5: true},
+   "bgm_quantity": { src: "assets/audio/bg/music_bg.mp3", loop: true, volume: 0.5, html5: true},
 };

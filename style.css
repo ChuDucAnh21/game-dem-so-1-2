@@ -67,6 +67,9 @@ canvas {
 
 /* Canvas game nằm trên 2 bg */
 #game-container > canvas {
+     max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* giữ tỷ lệ, luôn căn giữa */
     position: relative;
     z-index: 1;
 }
