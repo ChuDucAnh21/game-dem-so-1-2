@@ -2,12 +2,18 @@ import Phaser from 'phaser';
 import { QuantityScene } from './scenes/QuantityScene';
 import { EndGameScene } from './scenes/EndGameScene';
 import { initRotateOrientation } from './rotateOrientation';
+import unmuteAudio from 'unmute-ios-audio';
+
+unmuteAudio(); // register listeners sớm
+
 
 declare global {
     interface Window {
         compareScene: any;
     }
 }
+const DPR = Math.min(2, window.devicePixelRatio || 1); // tránh quá nặng trên máy yếu
+
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -19,11 +25,13 @@ const config: Phaser.Types.Core.GameConfig = {
     scale: {
         mode: Phaser.Scale.FIT, // Canvas tự fit vào container
         autoCenter: Phaser.Scale.CENTER_BOTH,
+        zoom: DPR, 
     },
     render: {
         pixelArt: false,
         antialias: true,
         transparent: true,
+        roundPixels:true,
     },
 };
 const game = new Phaser.Game(config);

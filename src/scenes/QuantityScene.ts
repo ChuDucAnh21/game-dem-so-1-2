@@ -3,15 +3,15 @@ import { showGameButtons } from '../main';
 import type { CountLevel } from '../game/quantity/quantityTypes';
 import { buildQuantityLevels } from '../game/quantity/quantityLevels';
 import { HowlerAudioManager } from '../assets/howler-manager/HowlerAudioManager';
-import { QUANTITY_SOUNDS,QUANTITY_IMAGES } from '../assets/quantityAssets';
+import { QUANTITY_SOUNDS, QUANTITY_IMAGES } from '../assets/quantityAssets';
 
 export class QuantityScene extends Phaser.Scene {
     private audio!: HowlerAudioManager;
     // brush cho tô
     private brushRadius = 24; // to hơn cho dễ tô tròn
-    
+
     private brushColor = 0x1b9cff; // xanh dương cho bé
-    private fillThreshold = 0.6; // 60% là đạt (dễ thở hơn)
+    private fillThreshold = 0.9; // 60% là đạt (dễ thở hơn)
     private paintGridSize = 10; // lưới 16x16 điểm mẫu cho mỗi vòng
 
     private currentLevelIndex = 0;
@@ -215,7 +215,7 @@ export class QuantityScene extends Phaser.Scene {
             | HTMLImageElement
             | HTMLCanvasElement;
 
-        const titleTargetWidth = this.getW() * 0.65; // chiếm ~85% chiều ngang
+        const titleTargetWidth = this.getW() * 0.75; // chiếm ~85% chiều ngang
         const titleScale = titleTargetWidth / titleTex.width;
 
         this.titleBanner = this.add
@@ -227,16 +227,18 @@ export class QuantityScene extends Phaser.Scene {
         // Text nằm TRONG panel_title, trùng tâm với banner
         this.add
             .text(
-                this.titleBanner.x,
-                this.titleBanner.y,
+                 Math.round(this.titleBanner.x),
+                 Math.round(this.titleBanner.y),
                 'BÉ ĐẾM ĐỒ VẬT VÀ TÔ SỐ HẠT ĐÚNG VỚI SỐ ĐÃ ĐẾM NHÉ!',
                 {
                     fontFamily: '"Baloo Chettan 2", sans-serif',
                     fontSize: `${Math.round(this.getH() * 0.038)}px`,
                     color: '#ffffff',
                     align: 'center',
-                    stroke: '#f1f2f4ff',
-                    strokeThickness: 1,
+                    stroke: '#0b3a66',
+                    strokeThickness:2,
+                    fontStyle:"Bold",
+                     letterSpacing: 1.5, 
                     wordWrap: {
                         width: this.titleBanner.displayWidth * 0.9, // wrap trong panel
                         useAdvancedWrap: true,
@@ -263,11 +265,13 @@ export class QuantityScene extends Phaser.Scene {
 
         const btnLabel = this.add.text(0, 0, 'HOÀN THÀNH', {
             fontFamily: '"Baloo Chettan 2", sans-serif',
-            fontSize: `${Math.round(this.getH() * 0.038)}px`,
+            fontSize: `${Math.round(this.getH() * 0.035)}px`,
             color: '#ffffff', // chữ trắng
             align: 'center',
-            stroke: '#ffffffff',
-            strokeThickness: 0,
+            fontStyle:"Bold",
+             stroke: '#0b3a66',
+                    strokeThickness:2,
+                     letterSpacing: 1.5, 
         });
         btnLabel.setOrigin(0.5);
 
@@ -761,7 +765,7 @@ export class QuantityScene extends Phaser.Scene {
         paintGfx.fillStyle(this.brushColor, 0.95);
         paintGfx.fillCircle(pointer.worldX, pointer.worldY, this.brushRadius);
 
-        // cập nhật ô trong lưới để tính % tô
+        // cập nhật ô trong lưới để tính % tô (PHỦ THEO BÁN KÍNH BÚT)
         const gridSize =
             (circle.getData('gridSize') as number) || this.paintGridSize;
         const paintedSet = circle.getData('paintSet') as Set<string>;
@@ -770,15 +774,36 @@ export class QuantityScene extends Phaser.Scene {
         const nx = dx / radius; // -1..1
         const ny = dy / radius; // -1..1
 
-        const gx = Math.floor(((nx + 1) / 2) * gridSize);
-        const gy = Math.floor(((ny + 1) / 2) * gridSize);
+        // bán kính bút ở hệ normalized (-1..1)
+        const brushN = this.brushRadius / radius; // vd 24px / radius
 
-        if (gx < 0 || gx >= gridSize || gy < 0 || gy >= gridSize) {
-            return;
+        // đổi ra bán kính tính theo số ô grid (xấp xỉ)
+        const rCells = Math.ceil((brushN * gridSize) / 2) + 1;
+
+        // tâm ô gần nhất
+        const cx = Math.floor(((nx + 1) / 2) * gridSize);
+        const cy = Math.floor(((ny + 1) / 2) * gridSize);
+
+        for (let gx = cx - rCells; gx <= cx + rCells; gx++) {
+            for (let gy = cy - rCells; gy <= cy + rCells; gy++) {
+                if (gx < 0 || gx >= gridSize || gy < 0 || gy >= gridSize)
+                    continue;
+
+                // tâm ô (gx,gy) chuẩn hoá về [-1,1]
+                const cellNx = ((gx + 0.5) / gridSize) * 2 - 1;
+                const cellNy = ((gy + 0.5) / gridSize) * 2 - 1;
+
+                // ô phải nằm trong hình tròn
+                if (cellNx * cellNx + cellNy * cellNy > 1) continue;
+
+                // ô phải nằm trong vùng brush
+                const ddx = cellNx - nx;
+                const ddy = cellNy - ny;
+                if (ddx * ddx + ddy * ddy <= brushN * brushN) {
+                    paintedSet.add(`${gx},${gy}`);
+                }
+            }
         }
-
-        const key = `${gx},${gy}`;
-        paintedSet.add(key);
     }
 
     // Tính tỉ lệ % vùng đã được tô trong 1 vòng (0..1)
