@@ -2,9 +2,7 @@ import Phaser from 'phaser';
 import { QuantityScene } from './scenes/QuantityScene';
 import { EndGameScene } from './scenes/EndGameScene';
 import { initRotateOrientation } from './rotateOrientation';
-import unmuteAudio from 'unmute-ios-audio';
 
-unmuteAudio(); // register listeners sớm
 
 
 declare global {

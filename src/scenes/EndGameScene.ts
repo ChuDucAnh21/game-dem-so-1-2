@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import { hideGameButtons } from '../main';
 import { HowlerAudioManager } from '../assets/howler-manager/HowlerAudioManager';
 
-
 export class EndGameScene extends Phaser.Scene {
     private audio!: HowlerAudioManager;
     private containerEl: HTMLElement | null = null;
@@ -12,8 +11,8 @@ export class EndGameScene extends Phaser.Scene {
         super('EndGameScene');
     }
     init(data: any) {
-  this.audio = data?.audio;
-}
+        this.audio = data?.audio;
+    }
 
     private clearDimBackground() {
         if (this.containerEl) {
@@ -30,14 +29,13 @@ export class EndGameScene extends Phaser.Scene {
         this.load.image('icon', 'assets/images/ui/icon.png');
         this.load.image('btn_reset', 'assets/images/ui/btn_reset.png');
         this.load.image('btn_exit', 'assets/images/ui/btn_exit.png');
-
     }
 
     create() {
         if (!this.audio) {
-    console.error('EndGameScene: missing audio manager (data.audio)');
-    return;
-  }
+            console.error('EndGameScene: missing audio manager (data.audio)');
+            return;
+        }
         const w = this.scale.width;
         const h = this.scale.height;
 
@@ -45,7 +43,6 @@ export class EndGameScene extends Phaser.Scene {
 
         // Phát âm thanh chúc mừng khi vào màn hình
         this.audio.play('complete');
-        this.audio.playBgm('bgm_quantity');
 
         this.containerEl = document.getElementById('game-container');
 
@@ -108,6 +105,8 @@ export class EndGameScene extends Phaser.Scene {
         replayBtn.on('pointerdown', () => {
             // 1. Tắt toàn bộ âm thanh đang chạy (end game + mọi scene khác)
             this.audio.stopAll();
+            // ✅ chỉ stop voice/sfx nếu bạn muốn sạch sẽ
+            this.audio.stopAllVoices?.();
 
             const compare = this.scene.get('QuantityScene') as any;
             compare?.stopAllVoices?.();
@@ -116,7 +115,7 @@ export class EndGameScene extends Phaser.Scene {
             this.clearDimBackground();
             this.stopConfetti();
             this.scene.stop('EndGameScene');
-           this.scene.start('QuantityScene'); // QuantityScene sẽ tự random level lại
+            this.scene.start('QuantityScene'); // QuantityScene sẽ tự random level lại
         });
 
         // Nút Thoát (tùy bạn xử lý gì)

@@ -24,7 +24,7 @@ export class HowlerAudioManager {
           loop: !!def.loop,
           volume: def.volume ?? 1,
           preload: true,
-          html5: def.html5 ?? (/iPad|iPhone|iPod/.test(navigator.userAgent) ||  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
+        
         })
       );
     }
@@ -45,6 +45,12 @@ export class HowlerAudioManager {
     this.currentPrompt = undefined;
     this.currentFeedback = undefined;
   }
+  stopAllExceptBgm(bgmKey = 'bgm_quantity') {
+  for (const [key, howl] of this.sounds.entries()) { // tuỳ bạn lưu map thế nào
+    if (key === bgmKey) continue;
+    howl.stop();
+  }
+}
 
   play(key: string, opts?: { volume?: number; onEnd?: () => void; stopSame?: boolean }) {
     const h = this.sounds.get(key);

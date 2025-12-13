@@ -6,6 +6,9 @@ import { HowlerAudioManager } from '../assets/howler-manager/HowlerAudioManager'
 import { QUANTITY_SOUNDS, QUANTITY_IMAGES } from '../assets/quantityAssets';
 
 export class QuantityScene extends Phaser.Scene {
+    init(data: any) {
+        if (data?.audio) this.audio = data.audio;
+    }
     private audio!: HowlerAudioManager;
     // brush cho tô
     private brushRadius = 24; // to hơn cho dễ tô tròn
@@ -165,7 +168,22 @@ export class QuantityScene extends Phaser.Scene {
 
     // ========= Create =========
 
-    create() {
+    async create() {
+        // chờ font load
+        await (document as any).fonts?.ready;
+
+        // hoặc ép load đúng cỡ chữ bạn dùng:
+        await (document as any).fonts?.load(
+            `700 ${Math.round(this.getH() * 0.038)}px "Baloo 2"`
+        );
+
+         if (!this.audio) {
+            this.audio = new HowlerAudioManager(QUANTITY_SOUNDS);
+        }
+
+        // ✅ play luôn (không chờ click)
+        this.audio.playBgm('bgm_quantity');
+
         // cho nút reload ngoài DOM bắn vào
         (window as any).quantityScene = this;
         (window as any).compareScene = this;
@@ -189,11 +207,7 @@ export class QuantityScene extends Phaser.Scene {
         // 🔊 Bật nhạc
         this.audio = new HowlerAudioManager(QUANTITY_SOUNDS);
 
-        // iOS: chỉ phát được sau user gesture
-        this.input.once('pointerdown', () => {
-            this.audio.unlock();
-            this.audio.playBgm('bgm_quantity');
-        });
+        
 
         // Bé
         this.avata_child = this.add
@@ -215,34 +229,36 @@ export class QuantityScene extends Phaser.Scene {
             | HTMLImageElement
             | HTMLCanvasElement;
 
-        const titleTargetWidth = this.getW() * 0.85; // chiếm ~85% chiều ngang
+        const titleTargetWidth = this.getW() * 0.92; // chiếm ~85% chiều ngang
         const titleScale = titleTargetWidth / titleTex.width;
+        const scaleYFactor = 0.75; // <-- giảm chiều cao (0.6~0.85 tuỳ thích)
 
         this.titleBanner = this.add
             .image(this.pctX(0.5), this.pctY(0.11), 'title_banner')
             .setOrigin(0.5)
-            .setScale(titleScale)
+            .setScale(titleScale, titleScale * scaleYFactor)
             .setDepth(900); // dưới text, trên background
 
         // Text nằm TRONG panel_title, trùng tâm với banner
         this.add
             .text(
-                 Math.round(this.titleBanner.x),
-                 Math.round(this.titleBanner.y),
-                'BÉ ĐẾM ĐỒ VẬT VÀ TÔ SỐ HẠT ĐÚNG VỚI SỐ ĐÃ ĐẾM NHÉ!',
+                Math.round(this.titleBanner.x),
+                Math.round(this.titleBanner.y),
+                'BÉ ĐẾM SỐ LƯỢNG ĐỒ VẬT VÀ TÔ SỐ VÒNG TƯƠNG ỨNG',
                 {
                     fontFamily: '"Baloo 2", sans-serif',
-                    fontSize: `${Math.round(this.getH() * 0.044)}px`,
+                    fontSize: `${Math.round(this.getH() * 0.054)}px`,
                     color: '#ffffff',
-                    align: 'center',
+                    align: 'bottom',
                     stroke: '#0b3a66',
-                    strokeThickness:2,
-                    fontStyle:"Bold",
-                     letterSpacing: 1.7, 
+                    strokeThickness: 2,
+                    fontStyle: 'Bold',
+                    letterSpacing: 1.0,
                     wordWrap: {
                         width: this.titleBanner.displayWidth * 0.9, // wrap trong panel
                         useAdvancedWrap: true,
                     },
+                    padding: { top: 10, bottom: 10, left: 6, right: 6 }, // ✅ CHỐNG CẮT DẤU
                 }
             )
             .setOrigin(0.5)
@@ -268,10 +284,15 @@ export class QuantityScene extends Phaser.Scene {
             fontSize: `${Math.round(this.getH() * 0.035)}px`,
             color: '#ffffff', // chữ trắng
             align: 'center',
-            fontStyle:"Bold",
-             stroke: '#0b3a66',
-                    strokeThickness:2,
-                     letterSpacing: 1.5, 
+            fontStyle: 'Bold',
+            stroke: '#0b3a66',
+            strokeThickness: 2,
+            letterSpacing: 1,
+            wordWrap: {
+                width: this.titleBanner.displayWidth * 0.9, // wrap trong panel
+                useAdvancedWrap: true,
+            },
+            padding: { top: 10, bottom: 10, left: 6, right: 6 }, // ✅ CHỐNG CẮT DẤU
         });
         btnLabel.setOrigin(0.5);
 
@@ -354,7 +375,7 @@ export class QuantityScene extends Phaser.Scene {
 
         // ✅ Panel cố định, KHÔNG phụ thuộc số lượng vật
         const panelWidth = this.getW() * 0.5;
-        const panelHeight = this.getH() * 0.36;
+        const panelHeight = this.getH() * 0.41;
 
         this.panelBounds = {
             centerX,
@@ -571,12 +592,18 @@ export class QuantityScene extends Phaser.Scene {
                     `${i + 1}`,
                     {
                         fontFamily: '"Baloo 2", sans-serif',
-                        fontSize: `${Math.round(this.getH() * 0.035)}px`,
-                        color: '#1b3f7a',
-                        fontStyle: 'bold',
-                        align: 'center',
-                        stroke: '#ffffff',
-                        strokeThickness: 3,
+                        fontSize: `${Math.round(this.getH() * 0.04)}px`,
+                        color: '#ffff00ff',
+                        align: 'bottom',
+                        stroke: '#000982ff',
+                        strokeThickness: 2,
+                        fontStyle: 'Bold',
+                        letterSpacing: 1.0,
+                        wordWrap: {
+                            width: this.titleBanner.displayWidth * 0.9, // wrap trong panel
+                            useAdvancedWrap: true,
+                        },
+                        padding: { top: 10, bottom: 10, left: 6, right: 6 }, // ✅ CHỐNG CẮT DẤU
                     }
                 )
                 .setOrigin(0.5, 0)
