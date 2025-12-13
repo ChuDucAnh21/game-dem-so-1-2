@@ -10,6 +10,11 @@ export class HowlerAudioManager {
   private currentPrompt?: Howl;
   private currentFeedback?: Howl;
 
+ 
+
+
+ 
+
   constructor(defs: Record<string, HowlerSoundDef>) {
     for (const [key, def] of Object.entries(defs)) {
       this.sounds.set(
@@ -19,6 +24,7 @@ export class HowlerAudioManager {
           loop: !!def.loop,
           volume: def.volume ?? 1,
           preload: true,
+          html5: def.html5 ?? (/iPad|iPhone|iPod/.test(navigator.userAgent) ||  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
         })
       );
     }

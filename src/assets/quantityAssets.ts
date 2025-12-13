@@ -1,6 +1,6 @@
 
 
-export type HowlerSoundDef = { src: string; volume?: number; loop?: boolean };
+export type HowlerSoundDef = { src: string; volume?: number; loop?: boolean;  html5?: boolean; };
 
 export type AssetItem = { key: string; url: string };
 

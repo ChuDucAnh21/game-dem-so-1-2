@@ -215,7 +215,7 @@ export class QuantityScene extends Phaser.Scene {
             | HTMLImageElement
             | HTMLCanvasElement;
 
-        const titleTargetWidth = this.getW() * 0.75; // chiếm ~85% chiều ngang
+        const titleTargetWidth = this.getW() * 0.85; // chiếm ~85% chiều ngang
         const titleScale = titleTargetWidth / titleTex.width;
 
         this.titleBanner = this.add
@@ -231,14 +231,14 @@ export class QuantityScene extends Phaser.Scene {
                  Math.round(this.titleBanner.y),
                 'BÉ ĐẾM ĐỒ VẬT VÀ TÔ SỐ HẠT ĐÚNG VỚI SỐ ĐÃ ĐẾM NHÉ!',
                 {
-                    fontFamily: '"Baloo Chettan 2", sans-serif',
-                    fontSize: `${Math.round(this.getH() * 0.038)}px`,
+                    fontFamily: '"Baloo 2", sans-serif',
+                    fontSize: `${Math.round(this.getH() * 0.044)}px`,
                     color: '#ffffff',
                     align: 'center',
                     stroke: '#0b3a66',
                     strokeThickness:2,
                     fontStyle:"Bold",
-                     letterSpacing: 1.5, 
+                     letterSpacing: 1.7, 
                     wordWrap: {
                         width: this.titleBanner.displayWidth * 0.9, // wrap trong panel
                         useAdvancedWrap: true,
@@ -264,7 +264,7 @@ export class QuantityScene extends Phaser.Scene {
         );
 
         const btnLabel = this.add.text(0, 0, 'HOÀN THÀNH', {
-            fontFamily: '"Baloo Chettan 2", sans-serif',
+            fontFamily: '"Baloo 2", sans-serif',
             fontSize: `${Math.round(this.getH() * 0.035)}px`,
             color: '#ffffff', // chữ trắng
             align: 'center',
@@ -570,7 +570,7 @@ export class QuantityScene extends Phaser.Scene {
                     sprite.y + sprite.displayHeight / 2 + this.getH() * 0.015,
                     `${i + 1}`,
                     {
-                        fontFamily: '"Baloo Chettan 2", sans-serif',
+                        fontFamily: '"Baloo 2", sans-serif',
                         fontSize: `${Math.round(this.getH() * 0.035)}px`,
                         color: '#1b3f7a',
                         fontStyle: 'bold',

@@ -1,23 +1,14 @@
-// <weight>: Use a value from 100 to 900
-// <uniquifier>: Use a unique and descriptive class name
 
-.roboto-<uniquifier> {
-  font-family: "Roboto", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: <weight>;
-  font-style: bold;
-  font-variation-settings:
-    "wdth" 100;
-}
 
 
 // <weight>: Use a value from 400 to 800
 // <uniquifier>: Use a unique and descriptive class name
-.baloo-chettan-2-<uniquifier> {
-  font-family: "Baloo Chettan 2", sans-serif;
+
+.baloo-2-<uniquifier> {
+  font-family: "Baloo 2", sans-serif;
   font-optical-sizing: auto;
-  font-weight: <weight>;
-  font-style: bold;
+  font-weight: 700;
+  font-style: normal;
 }
 
 
