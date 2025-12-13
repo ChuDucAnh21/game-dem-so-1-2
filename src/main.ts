@@ -32,6 +32,29 @@ const config: Phaser.Types.Core.GameConfig = {
         roundPixels:true,
     },
 };
+
+
+
+async function ensureFontsReady() {
+  // kích hoạt tải font chắc chắn
+  await document.fonts.load(`400 48px "Baloo 2"`);
+  await document.fonts.load(`700 48px "Baloo 2"`);
+  await document.fonts.ready;
+
+  // check chắc ăn
+  const start = performance.now();
+  while (performance.now() - start < 4000) {
+    if (
+      document.fonts.check(`400 48px "Baloo 2"`) &&
+      document.fonts.check(`700 48px "Baloo 2"`)
+    ) break;
+    await new Promise((r) => setTimeout(r, 50));
+  }
+}
+window.addEventListener("load", async () => {
+  await ensureFontsReady();
+//   new Phaser.Game(config);
+});
 const game = new Phaser.Game(config);
 
 
@@ -78,3 +101,6 @@ window.addEventListener('orientationchange', updateUIButtonScale);
 document.getElementById('btn-reset')?.addEventListener('click', () => {
     window.compareScene?.restartGame();
 });
+
+
+

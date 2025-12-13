@@ -252,7 +252,7 @@ export class QuantityScene extends Phaser.Scene {
                     align: 'bottom',
                     stroke: '#0b3a66',
                     strokeThickness: 2,
-                    fontStyle: 'Bold',
+                    fontStyle: '700',
                     letterSpacing: 1.0,
                     wordWrap: {
                         width: this.titleBanner.displayWidth * 0.9, // wrap trong panel
@@ -284,12 +284,12 @@ export class QuantityScene extends Phaser.Scene {
             fontSize: `${Math.round(this.getH() * 0.035)}px`,
             color: '#ffffff', // chữ trắng
             align: 'center',
-            fontStyle: 'Bold',
+            fontStyle: '700',
             stroke: '#0b3a66',
             strokeThickness: 2,
             letterSpacing: 1,
             wordWrap: {
-                width: this.titleBanner.displayWidth * 0.9, // wrap trong panel
+                width: this.titleBanner.displayWidth * 0.2, // wrap trong panel
                 useAdvancedWrap: true,
             },
             padding: { top: 10, bottom: 10, left: 6, right: 6 }, // ✅ CHỐNG CẮT DẤU
@@ -597,7 +597,7 @@ export class QuantityScene extends Phaser.Scene {
                         align: 'bottom',
                         stroke: '#000982ff',
                         strokeThickness: 2,
-                        fontStyle: 'Bold',
+                        fontStyle: '700',
                         letterSpacing: 1.0,
                         wordWrap: {
                             width: this.titleBanner.displayWidth * 0.9, // wrap trong panel
