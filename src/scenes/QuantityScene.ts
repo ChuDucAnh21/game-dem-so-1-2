@@ -177,7 +177,7 @@ export class QuantityScene extends Phaser.Scene {
             `700 ${Math.round(this.getH() * 0.038)}px "Baloo 2"`
         );
 
-         if (!this.audio) {
+        if (!this.audio) {
             this.audio = new HowlerAudioManager(QUANTITY_SOUNDS);
         }
 
@@ -206,8 +206,6 @@ export class QuantityScene extends Phaser.Scene {
 
         // 🔊 Bật nhạc
         this.audio = new HowlerAudioManager(QUANTITY_SOUNDS);
-
-        
 
         // Bé
         this.avata_child = this.add
@@ -281,7 +279,7 @@ export class QuantityScene extends Phaser.Scene {
 
         const btnLabel = this.add.text(0, 0, 'HOÀN THÀNH', {
             fontFamily: '"Baloo 2", sans-serif',
-            fontSize: `${Math.round(this.getH() * 0.035)}px`,
+            fontSize: `${Math.round(this.getH() * 0.044)}px`,
             color: '#ffffff', // chữ trắng
             align: 'center',
             fontStyle: '700',
@@ -506,7 +504,7 @@ export class QuantityScene extends Phaser.Scene {
         if (count <= 0) return;
 
         const centerX = this.panelBounds.centerX || this.pctX(0.5);
-        const centerY = this.panelBounds.centerY || this.pctY(0.4);
+        const centerY = this.panelBounds.centerY || this.pctY(0.9);
         const panelW = this.panelBounds.width || this.getW() * 0.8;
         const panelH = this.panelBounds.height || this.getH() * 0.36;
 
@@ -535,7 +533,7 @@ export class QuantityScene extends Phaser.Scene {
 
         for (let i = 0; i < count; i++) {
             const x = startX + i * slotWidth;
-            const y = centerY;
+            const y = centerY - panelH * 0.06;
 
             const iconKey = Phaser.Utils.Array.GetRandom
                 ? Phaser.Utils.Array.GetRandom(iconPool)
@@ -546,7 +544,6 @@ export class QuantityScene extends Phaser.Scene {
                 .setOrigin(0.5)
                 .setDepth(2);
 
-            // tái dùng hàm scale cũ
             const scale = this.getScaleForTexture(
                 iconKey,
                 maxObjWidth,
@@ -557,16 +554,31 @@ export class QuantityScene extends Phaser.Scene {
             (sprite as any).baseScaleX = sprite.scaleX;
             (sprite as any).baseScaleY = sprite.scaleY;
 
+            // ✅ lưu Y gốc để không bị trôi vị trí
+            sprite.setData('baseY', y);
+
             sprite.setInteractive({ useHandCursor: true });
             sprite.on('pointerdown', () => {
                 if (this.state === 'result') return;
+
                 this.audio.play('sfx-click');
+
+                const baseY = sprite.getData('baseY') as number;
+
+                // ✅ dừng tween cũ + kéo về đúng vị trí gốc trước khi bounce lại
+                this.tweens.killTweensOf(sprite);
+                sprite.y = baseY;
+
                 this.tweens.add({
                     targets: sprite,
-                    y: sprite.y - 20,
+                    y: baseY - 20, // ✅ luôn bounce theo baseY, không theo y hiện tại
                     duration: 120,
                     yoyo: true,
                     ease: 'Sine.out',
+                    onComplete: () => {
+                        // ✅ chốt lại đúng baseY (phòng trường hợp tween bị ngắt giữa chừng)
+                        sprite.y = baseY;
+                    },
                 });
             });
 
@@ -588,11 +600,11 @@ export class QuantityScene extends Phaser.Scene {
             const label = this.add
                 .text(
                     sprite.x,
-                    sprite.y + sprite.displayHeight / 2 + this.getH() * 0.015,
+                    sprite.y + sprite.displayHeight / 2 + this.getH() * 0.007,
                     `${i + 1}`,
                     {
                         fontFamily: '"Baloo 2", sans-serif',
-                        fontSize: `${Math.round(this.getH() * 0.04)}px`,
+                        fontSize: `${Math.round(this.getH() * 0.06)}px`,
                         color: '#ffff00ff',
                         align: 'bottom',
                         stroke: '#000982ff',
@@ -1123,8 +1135,9 @@ export class QuantityScene extends Phaser.Scene {
         }
     }
 
-    private showResultScreen() {
+    private   showResultScreen() {
         this.state = 'result';
+
         this.clearObjectsAndCircles();
 
         // 📴 tắt nhạc nền khi sang màn kết thúc
@@ -1181,4 +1194,7 @@ export class QuantityScene extends Phaser.Scene {
         this.clearObjectsAndCircles();
         this.showCurrentLevel();
     }
+
+    
+
 }

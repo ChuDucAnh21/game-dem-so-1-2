@@ -30,6 +30,7 @@ const config: Phaser.Types.Core.GameConfig = {
         antialias: true,
         transparent: true,
         roundPixels:true,
+       
     },
 };
 
