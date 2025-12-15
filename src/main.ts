@@ -20,15 +20,15 @@ const config: Phaser.Types.Core.GameConfig = {
     scale: {
         mode: Phaser.Scale.FIT, // Canvas tự fit vào container
         autoCenter: Phaser.Scale.NO_CENTER,
-        zoom: DPR, 
+        // zoom: DPR, 
     },
     render: {
         pixelArt: false,
         antialias: true,
         transparent: true,
         roundPixels:true,
-       
-    },
+         pixelRatio: DPR,
+    } as any
 };
 
 
@@ -53,7 +53,34 @@ window.addEventListener("load", async () => {
   await ensureFontsReady();
 //   new Phaser.Game(config);
 });
- new Phaser.Game(config);
+ const game = new Phaser.Game(config);
+
+ //-------------
+function applySafeVh() {
+  const vv = window.visualViewport;
+  const h = Math.round(vv?.height ?? window.innerHeight);
+
+  document.documentElement.style.setProperty("--vh", `${h * 0.01}px`);
+
+  const container = document.getElementById("game-container");
+  if (container) {
+    container.style.width = "100vw";
+    container.style.height = `calc(var(--vh) * 100)`;
+  }
+
+  game.scale.refresh(); // quan trọng với FIT
+}
+function stabilize() {
+  applySafeVh();
+  requestAnimationFrame(applySafeVh);
+  setTimeout(applySafeVh, 250);
+}
+window.addEventListener("resize", stabilize);
+window.addEventListener("orientationchange", stabilize);
+window.visualViewport?.addEventListener("resize", stabilize);
+window.visualViewport?.addEventListener("scroll", stabilize);
+stabilize();
+//------------
 
 
 function updateUIButtonScale() {
@@ -85,14 +112,15 @@ export function hideGameButtons() {
     reset!.style.display = 'none';
 }
 
-// Scale nút
-updateUIButtonScale();
-window.addEventListener('resize', updateUIButtonScale);
-window.addEventListener('orientationchange', updateUIButtonScale);
+function scheduleUpdateUIButtonScale() {
+  requestAnimationFrame(updateUIButtonScale);
+  setTimeout(updateUIButtonScale, 250);
+}
 
-document.getElementById('btn-reset')?.addEventListener('click', () => {
-    window.compareScene?.restartGame();
-});
+scheduleUpdateUIButtonScale();
+window.addEventListener("resize", scheduleUpdateUIButtonScale);
+window.addEventListener("orientationchange", scheduleUpdateUIButtonScale);
+window.visualViewport?.addEventListener("resize", scheduleUpdateUIButtonScale);
 
 
 

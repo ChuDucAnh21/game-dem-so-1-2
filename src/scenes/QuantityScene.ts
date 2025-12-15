@@ -175,7 +175,6 @@ export class QuantityScene extends Phaser.Scene {
     // ========= Create =========
 
     async create() {
-        
         // chờ font load
         await (document as any).fonts?.ready;
 
@@ -372,37 +371,38 @@ export class QuantityScene extends Phaser.Scene {
 
         // ✅ Nếu audio đã sẵn sàng (từ EndGameScene “Chơi lại”) → không gắn click để phát lại prompt
         if (!this.audioReady) {
-    this.input.once('pointerdown', async () => {
-        await Promise.resolve(this.audio.unlock?.());
+            this.input.once('pointerdown', async () => {
+                await Promise.resolve(this.audio.unlock?.());
 
-        const shouldShowRotate =
-            window.innerHeight > window.innerWidth &&
-            window.innerWidth < 768;
+                const shouldShowRotate =
+                    window.innerHeight > window.innerWidth &&
+                    window.innerWidth < 768;
 
-        if (shouldShowRotate) {
-            playVoiceLocked(this.audio, 'voice_rotate');
-            return;
+                if (shouldShowRotate) {
+                    playVoiceLocked(this.audio, 'voice_rotate');
+                    return;
+                }
+
+                // ✅ BGM luôn phát sau unlock
+                this.audio.playBgm('bgm_quantity');
+
+                // ✅ Prompt chỉ phát đúng 1 lần
+                if (!this.initialPromptPlayed) {
+                    this.initialPromptPlayed = true;
+                    const lvl = this.levels[this.currentLevelIndex];
+                    this.playPromptForLevel(lvl);
+                }
+
+                // ✅ sau unlock thì coi như audioReady
+                this.audioReady = true;
+            });
+        } else {
+            this.audio.playBgm('bgm_quantity');
         }
-
-        // ✅ BGM luôn phát sau unlock
-        this.audio.playBgm('bgm_quantity');
-
-        // ✅ Prompt chỉ phát đúng 1 lần
-        if (!this.initialPromptPlayed) {
-            this.initialPromptPlayed = true;
-            const lvl = this.levels[this.currentLevelIndex];
-            this.playPromptForLevel(lvl);
-        }
-
-        // ✅ sau unlock thì coi như audioReady
-        this.audioReady = true;
-    });
-} else {
-    this.audio.playBgm('bgm_quantity');
-}
-
 
         showGameButtons();
+
+        
     }
 
     private updateObjectsPanel() {

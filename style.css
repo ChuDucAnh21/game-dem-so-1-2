@@ -110,3 +110,5 @@ canvas {
     transform: scale(1.12);
     transition: 0.15s;
 }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+#game-container { width: 100vw; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
