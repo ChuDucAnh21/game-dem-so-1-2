@@ -22,6 +22,7 @@ export const QUANTITY_IMAGES: AssetItem[] = [
 
   // UI
   { key: 'circle_empty', url: 'assets/images/ui/circle.png' },
+  { key: 'circle_border', url: 'assets/images/ui/circle_border.png' },
   { key: 'circle_filled', url: 'assets/images/ui/circle_filled.png' },
   { key: 'objects_panel', url: 'assets/images/ui/board.png' },
   { key: 'title_banner', url: 'assets/images/ui/title_banner.png' },
@@ -42,6 +43,7 @@ export const QUANTITY_SOUNDS: Record<string, HowlerSoundDef> = {
   //hướng dẫn (prompt)
   "prompt_quantity_1": { src: "assets/audio/prompt/prompt_draw_hustle.mp3", volume: 1.0, html5: true },
   "prompt_quantity_2": { src: "assets/audio/prompt/prompt_draw_ballon.mp3", volume: 1.0, html5: true},
+   "voice_rotate": { src: "assets/audio/prompt/voice_rotate.mp3", volume: 1.0, html5: true},
 
   //khen
   "correct_quantity_1": { src: "assets/audio/sfx/correct_answer.mp3", volume: 0.9, html5: true },
@@ -58,5 +60,7 @@ export const QUANTITY_SOUNDS: Record<string, HowlerSoundDef> = {
   //khác
   "voice_try_again": { src: "assets/audio/prompt/retry_draw.mp3", volume: 1.0 , html5: true},
 
-   "bgm_quantity": { src: "assets/audio/bg/music_bg.mp3", loop: true, volume: 0.4, html5: true},
+   "bgm_quantity": { src: "assets/audio/bg/music_bg.mp3", loop: true, volume: 0.3, html5: true},
+
+  
 };

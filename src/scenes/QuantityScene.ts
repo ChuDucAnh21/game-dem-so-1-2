@@ -4,6 +4,9 @@ import type { CountLevel } from '../game/quantity/quantityTypes';
 import { buildQuantityLevels } from '../game/quantity/quantityLevels';
 import { HowlerAudioManager } from '../assets/howler-manager/HowlerAudioManager';
 import { QUANTITY_SOUNDS, QUANTITY_IMAGES } from '../assets/quantityAssets';
+import { initRotateOrientation } from '../rotateOrientation';
+import { playVoiceLocked } from '../rotateOrientation';
+
 
 export class QuantityScene extends Phaser.Scene {
     init(data: any) {
@@ -96,7 +99,7 @@ export class QuantityScene extends Phaser.Scene {
                 paintGfx.clear();
 
                 // Tô full vòng với màu xanh lá
-                const radius = (circle.displayWidth / 2) * 0.998;
+                const radius = (circle.displayWidth / 2) * 0.92;
                 paintGfx.fillStyle(0x00c853, 0.95); // xanh lá tươi
                 paintGfx.fillCircle(circle.x, circle.y, radius);
             }
@@ -156,6 +159,7 @@ export class QuantityScene extends Phaser.Scene {
             this.hintFinger = undefined;
         }
     }
+    
 
     // ========= Preload =========
 
@@ -179,7 +183,10 @@ export class QuantityScene extends Phaser.Scene {
 
         if (!this.audio) {
             this.audio = new HowlerAudioManager(QUANTITY_SOUNDS);
+
         }
+
+        
 
         // ✅ play luôn (không chờ click)
         this.audio.playBgm('bgm_quantity');
@@ -204,8 +211,6 @@ export class QuantityScene extends Phaser.Scene {
             this.bgLayerB.classList.remove('visible');
         }
 
-        // 🔊 Bật nhạc
-        this.audio = new HowlerAudioManager(QUANTITY_SOUNDS);
 
         // Bé
         this.avata_child = this.add
@@ -364,8 +369,10 @@ export class QuantityScene extends Phaser.Scene {
         this.state = 'playing';
 
         this.showCurrentLevel();
+        initRotateOrientation(this.game, { audio: this.audio });
         showGameButtons();
     }
+ 
 
     private updateObjectsPanel() {
         const centerX = this.pctX(0.5);
@@ -436,7 +443,8 @@ export class QuantityScene extends Phaser.Scene {
 
     private playPromptForLevel(level: CountLevel) {
         if (!level.promptKey) return;
-        this.audio.playPrompt(level.promptKey);
+        // this.audio.playPrompt(level.promptKey);
+        playVoiceLocked(this.audio, level.promptKey);
     }
 
     // ========= Show level =========
@@ -463,6 +471,8 @@ export class QuantityScene extends Phaser.Scene {
     private clearObjectsAndCircles() {
         this.objectSprites.forEach((s) => s.destroy());
         this.circleSprites.forEach((s) => s.destroy());
+       
+
         this.objectSprites = [];
         this.circleSprites = [];
 
@@ -730,13 +740,14 @@ export class QuantityScene extends Phaser.Scene {
             const paintGfx = this.add.graphics().setDepth(3); // TRÊN vòng tròn
             paintGfx.setScrollFactor(0);
 
-            // 3) Tạo mask hình tròn cho paintGfx
+            
+            // 4) Tạo mask hình tròn cho paintGfx
             const maskGfx = this.make.graphics({ x: 0, y: 0 }, false);
             maskGfx.fillStyle(0xffffff);
             maskGfx.fillCircle(
                 circle.x,
                 circle.y,
-                (circle.displayWidth / 2) * 0.9
+                (circle.displayWidth / 2) * 0.92
             );
 
             const circleMask = maskGfx.createGeometryMask();
@@ -1135,7 +1146,7 @@ export class QuantityScene extends Phaser.Scene {
         }
     }
 
-    private   showResultScreen() {
+    private  showResultScreen() {
         this.state = 'result';
 
         this.clearObjectsAndCircles();
@@ -1153,6 +1164,10 @@ export class QuantityScene extends Phaser.Scene {
         // 👉 clear luôn hint nếu còn
         this.hidePaintHint();
     }
+    
+    
+   
+    
 
     restartGame() {
         this.stopAllVoices();
@@ -1194,6 +1209,7 @@ export class QuantityScene extends Phaser.Scene {
         this.clearObjectsAndCircles();
         this.showCurrentLevel();
     }
+    
 
     
 

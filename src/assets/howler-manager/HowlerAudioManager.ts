@@ -10,28 +10,28 @@ export class HowlerAudioManager {
   private currentPrompt?: Howl;
   private currentFeedback?: Howl;
 
+ 
 
-  
 
-constructor(defs: Record<string, HowlerSoundDef>) {
-  for (const [key, def] of Object.entries(defs)) {
-    this.sounds.set(
-      key,
-      new Howl({
-        src: [def.src],
-        loop: !!def.loop,
-        volume: def.volume ?? 1,
-        preload: true,
+ 
 
-        // ✅ iOS silent-mode workaround
-        html5: /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-             (navigator.userAgent.includes("Mac") && "ontouchend" in document) // iPadOS giả Mac, // hoặc chỉ bật cho bgm/voice nếu bạn muốn giữ WebAudio cho sfx
-      })
-    );
+  constructor(defs: Record<string, HowlerSoundDef>) {
+    for (const [key, def] of Object.entries(defs)) {
+      this.sounds.set(
+        key,
+        new Howl({
+          src: [def.src],
+          loop: !!def.loop,
+          volume: def.volume ?? 1,
+          preload: true,
+        
+        })
+      );
+    }
   }
-}
 
   unlock() {
+    // iOS cần gesture để resume WebAudio context
     Howler.ctx?.resume?.();
   }
 
