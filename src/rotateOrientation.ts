@@ -19,6 +19,25 @@ const ROTATE_VOICE_COOLDOWN = 1500; // ms
 let audioUnlockedByUser = false; // ✅ tap 1 lần là unlock, các lần sau auto play
 let rotateInited = false; // ✅ tránh addEventListener nhiều lần (nếu bạn init nhiều scene)
 
+// ✅ NEW: debounce update để tránh innerWidth/innerHeight “lỡ cỡ”
+let rafId: number | null = null;
+function scheduleUpdateRotateHint() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+        updateRotateHint();
+        // iOS/Safari đôi khi cập nhật kích thước trễ 1 frame
+        requestAnimationFrame(updateRotateHint);
+    });
+}
+
+// ✅ NEW: lấy size ổn định hơn trên mobile (đặc biệt iOS)
+function getViewportSize() {
+    const vv = window.visualViewport;
+    const w = vv?.width ?? window.innerWidth;
+    const h = vv?.height ?? window.innerHeight;
+    return { w, h };
+}
+
 // ================== ƯU TIÊN VOICE ==================
 function getVoicePriority(key: string): number {
     if (key.startsWith('drag_') || key.startsWith('q_')) return 1;
@@ -43,8 +62,6 @@ function getVoicePriority(key: string): number {
 export function playVoiceLocked(audio: HowlerAudioManager, key: string): void {
     // Nếu đang cần xoay ngang -> chỉ cho phép voice_rotate
     if (isRotateOverlayActive && key !== 'voice_rotate') {
-        // lưu lại câu hỏi để phát lại sau khi xoay xong
-        // if (!pendingQuestionKey && key.startsWith("q_")) pendingQuestionKey = key;
         pendingQuestionKey = key;
         return;
     }
@@ -114,7 +131,6 @@ function tryPlayRotateVoice() {
     if (now - lastRotateVoiceTime < ROTATE_VOICE_COOLDOWN) return;
     lastRotateVoiceTime = now;
 
-    // iOS cần gesture: vì vậy hàm này sẽ được gọi cả từ pointerdown nữa
     playVoiceLocked(audioRef, 'voice_rotate');
 }
 
@@ -122,8 +138,8 @@ function updateRotateHint() {
     ensureRotateOverlay();
     if (!rotateOverlay) return;
 
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    // ❗️CHANGED: dùng viewport size ổn định hơn
+    const { w, h } = getViewportSize();
     const shouldShow = h > w && w < 768; // portrait & nhỏ
 
     const overlayWasActive = isRotateOverlayActive;
@@ -144,7 +160,6 @@ function updateRotateHint() {
         audioRef.stopAllExceptBgm('bgm_quantity');
         currentVoiceKey = null;
 
-        // ✅ Nếu đã từng tap unlock rồi -> auto nhắc xoay ngay khi bị xoay dọc lại
         if (audioUnlockedByUser) {
             tryPlayRotateVoice();
         }
@@ -154,13 +169,11 @@ function updateRotateHint() {
         audioRef.stopAllExceptBgm('bgm_quantity');
         currentVoiceKey = null;
 
-        // ✅ bật BGM sau khi xoay ngang xong
         if (!bgmStarted) {
             audioRef.playBgm('bgm_quantity');
             bgmStarted = true;
         }
 
-        // ✅ phát lại prompt/câu hỏi đã lưu
         if (pendingQuestionKey) {
             playVoiceLocked(audioRef, pendingQuestionKey);
             pendingQuestionKey = null;
@@ -177,19 +190,25 @@ export function initRotateOrientation(options: {
     audioRef = options.audio;
 
     ensureRotateOverlay();
-    updateRotateHint();
+    // ❗️CHANGED: dùng schedule thay vì gọi thẳng
+    scheduleUpdateRotateHint();
 
-    if (rotateInited) return; // ✅ tránh add listener nhiều lần
+    if (rotateInited) return;
     rotateInited = true;
 
-    window.addEventListener('resize', updateRotateHint);
-    window.addEventListener('orientationchange', updateRotateHint as any);
+    // ❗️CHANGED: resize/orientationchange dùng schedule để tránh “lúc được lúc không”
+    window.addEventListener('resize', scheduleUpdateRotateHint);
 
-    // ✅ Lần đầu cần tap để iOS cho phép phát âm thanh
+    window.addEventListener('orientationchange', () => {
+        scheduleUpdateRotateHint();
+        // iOS/Safari hay cập nhật size trễ -> gọi lại sau 250ms
+        setTimeout(scheduleUpdateRotateHint, 250);
+    });
+
     window.addEventListener('pointerdown', () => {
         if (!isRotateOverlayActive) return;
 
-        audioUnlockedByUser = true;     // ✅ unlock vĩnh viễn cho các lần sau
-        tryPlayRotateVoice();           // ✅ tap lần đầu sẽ phát voice_rotate
+        audioUnlockedByUser = true;
+        tryPlayRotateVoice();
     });
 }
