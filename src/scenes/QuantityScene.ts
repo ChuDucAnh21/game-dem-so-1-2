@@ -9,9 +9,11 @@ import { playVoiceLocked } from '../rotateOrientation';
 
 export class QuantityScene extends Phaser.Scene {
     private audioReady = false; // ✅ thêm dòng này
+    private forcePrompt = false;
     init(data: any) {
         if (data?.audio) this.audio = data.audio;
         this.audioReady = !!data?.audioReady; // ✅ thêm dòng này
+         this.forcePrompt = !!data?.forcePrompt;
     }
     private audio!: HowlerAudioManager;
     // brush cho tô
@@ -401,8 +403,14 @@ export class QuantityScene extends Phaser.Scene {
         }
 
         showGameButtons();
+        // ✅ nếu được yêu cầu force prompt (reset) thì phát lại prompt level 0
+if (this.forcePrompt && this.audioReady) {
+  this.time.delayedCall(0, () => {
+    const lvl = this.levels[this.currentLevelIndex];
+    this.playPromptForLevel(lvl);
+  });
+}
 
-        
     }
 
     private updateObjectsPanel() {
@@ -474,8 +482,8 @@ export class QuantityScene extends Phaser.Scene {
 
     private playPromptForLevel(level: CountLevel) {
         if (!level.promptKey) return;
-        // this.audio.playPrompt(level.promptKey);
-        playVoiceLocked(this.audio, level.promptKey);
+        this.audio.playPrompt(level.promptKey);
+        // playVoiceLocked(this.audio, level.promptKey);
     }
 
     // ========= Show level =========

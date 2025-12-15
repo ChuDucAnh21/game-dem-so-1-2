@@ -54,7 +54,7 @@ window.addEventListener("load", async () => {
 //   new Phaser.Game(config);
 });
  const game = new Phaser.Game(config);
-
+(window as any).__game = game; // ✅ expose game
  //-------------
 function applySafeVh() {
   const vv = window.visualViewport;
@@ -119,8 +119,24 @@ function scheduleUpdateUIButtonScale() {
 
 scheduleUpdateUIButtonScale();
 document.getElementById('btn-reset')?.addEventListener('click', () => {
-    window.compareScene?.restartGame();
+  const game = (window as any).__game as Phaser.Game;
+  if (!game) return;
+
+  // lấy audio từ scene nào cũng được
+  const anyScene = (game.scene.getScenes(true)[0] as any) || (window as any).compareScene;
+  const audio = anyScene?.audio;
+
+  // dừng hết voice/sfx đang chạy, giữ BGM (nếu đang có)
+  audio?.stopAllExceptBgm?.('bgm_quantity');
+
+  // ✅ QUAN TRỌNG: start lại QuantityScene bằng SceneManager
+  game.scene.start('QuantityScene', {
+    audio,
+    audioReady: true,
+    forcePrompt: true,
+  });
 });
+
 window.addEventListener("resize", scheduleUpdateUIButtonScale);
 window.addEventListener("orientationchange", scheduleUpdateUIButtonScale);
 window.visualViewport?.addEventListener("resize", scheduleUpdateUIButtonScale);

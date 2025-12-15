@@ -1,96 +1,95 @@
-import { Howl, Howler } from "howler";
-import type { HowlerSoundDef } from "../quantityAssets";
+import { Howl, Howler } from 'howler';
+import type { HowlerSoundDef } from '../quantityAssets';
 
 export class HowlerAudioManager {
-  private sounds = new Map<string, Howl>();
+    private sounds = new Map<string, Howl>();
 
-   stopAll() {
-    Howler.stop();
-  }
-
-  private currentPrompt?: Howl;
-  private currentFeedback?: Howl;
-
- 
-
-
- 
-
-  constructor(defs: Record<string, HowlerSoundDef>) {
-    for (const [key, def] of Object.entries(defs)) {
-      this.sounds.set(
-        key,
-        new Howl({
-          src: [def.src],
-          loop: !!def.loop,
-          volume: def.volume ?? 1,
-          preload: true,
-          html5: def.html5 === true ,
-        })
-      );
+    private currentPrompt?: Howl;
+    private currentFeedback?: Howl;
+    stopAll() {
+        Howler.stop();
     }
-  }
 
-  unlock() {
-    // iOS cần gesture để resume WebAudio context
-    Howler.ctx?.resume?.();
-  }
 
-  has(key: string) {
-    return this.sounds.has(key);
-  }
+    constructor(defs: Record<string, HowlerSoundDef>) {
+        for (const [key, def] of Object.entries(defs)) {
+            this.sounds.set(
+                key,
+                new Howl({
+                    src: [def.src],
+                    loop: !!def.loop,
+                    volume: def.volume ?? 1,
+                    preload: true,
+                    html5: def.html5 === true,
+                })
+            );
+        }
+    }
 
-  stopAllVoices() {
-    this.currentPrompt?.stop();
-    this.currentFeedback?.stop();
-    this.currentPrompt = undefined;
-    this.currentFeedback = undefined;
-  }
-  stopAllExceptBgm(bgmKey = 'bgm_quantity') {
-  for (const [key, howl] of this.sounds.entries()) { // tuỳ bạn lưu map thế nào
-    if (key === bgmKey) continue;
-    howl.stop();
-  }
-}
+    unlock() {
+        // iOS cần gesture để resume WebAudio context
+        Howler.ctx?.resume?.();
+    }
 
-  play(key: string, opts?: { volume?: number; onEnd?: () => void; stopSame?: boolean }) {
-    const h = this.sounds.get(key);
-    if (!h) return;
+    has(key: string) {
+        return this.sounds.has(key);
+    }
 
-    if (opts?.stopSame) h.stop();
+    stopAllVoices() {
+        this.currentPrompt?.stop();
+        this.currentFeedback?.stop();
+        this.currentPrompt = undefined;
+        this.currentFeedback = undefined;
+    }
+    stopAllExceptBgm(bgmKey = 'bgm_quantity') {
+        for (const [key, howl] of this.sounds.entries()) {
+            // tuỳ bạn lưu map thế nào
+            if (key === bgmKey) continue;
+            howl.stop();
+        }
+    }
 
-    const id = h.play();
-    if (opts?.volume != null) h.volume(opts.volume, id);
-    if (opts?.onEnd) h.once("end", opts.onEnd, id);
-  }
+    play(
+        key: string,
+        opts?: { volume?: number; onEnd?: () => void; stopSame?: boolean }
+    ) {
+        const h = this.sounds.get(key);
+        if (!h) return;
 
-  playPrompt(key?: string) {
-    if (!key) return;
-    this.stopAllVoices();
-    const h = this.sounds.get(key);
-    if (!h) return;
-    this.currentPrompt = h;
-    h.stop();
-    h.play();
-  }
+        if (opts?.stopSame) h.stop();
 
-  playFeedback(key: string, onEnd?: () => void) {
-    this.stopAllVoices();
-    const h = this.sounds.get(key);
-    if (!h) return;
-    this.currentFeedback = h;
-    h.stop();
-    this.play(key, { onEnd });
-  }
+        const id = h.play();
+        if (opts?.volume != null) h.volume(opts.volume, id);
+        if (opts?.onEnd) h.once('end', opts.onEnd, id);
+    }
 
-  playBgm(key = "bgm_quantity") {
-    const h = this.sounds.get(key);
-    if (!h) return;
-    if (h.playing()) return;
-    h.play();
-  }
+    playPrompt(key?: string) {
+        if (!key) return;
+        this.stopAllVoices();
+        const h = this.sounds.get(key);
+        if (!h) return;
+        this.currentPrompt = h;
+        h.stop();
+        h.play();
+    }
 
-  stopBgm(key = "bgm_quantity") {
-    this.sounds.get(key)?.stop();
-  }
+    playFeedback(key: string, onEnd?: () => void) {
+        this.stopAllVoices();
+        const h = this.sounds.get(key);
+        if (!h) return;
+        this.currentFeedback = h;
+        h.stop();
+        this.play(key, { onEnd });
+    }
+
+    playBgm(key = 'bgm_quantity') {
+        const h = this.sounds.get(key);
+        if (!h) return;
+        if (h.playing()) return;
+        h.play();
+    }
+
+    stopBgm(key = 'bgm_quantity') {
+        this.sounds.get(key)?.stop();
+    }
 }
