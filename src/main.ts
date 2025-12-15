@@ -53,7 +53,7 @@ window.addEventListener("load", async () => {
   await ensureFontsReady();
 //   new Phaser.Game(config);
 });
-const game = new Phaser.Game(config);
+ new Phaser.Game(config);
 
 
 function updateUIButtonScale() {

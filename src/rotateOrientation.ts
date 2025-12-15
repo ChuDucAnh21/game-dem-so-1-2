@@ -1,9 +1,8 @@
-// src/rotateOrientation.ts
-import Phaser from 'phaser';
+
 import type { HowlerAudioManager } from './assets/howler-manager/HowlerAudioManager'; // <-- sửa path đúng theo dự án bạn
 
 // ================== STATE CHUNG ==================
-let gameRef: Phaser.Game | null = null;
+
 let bgmStarted = false;
 
 let rotateOverlay: HTMLDivElement | null = null;
@@ -175,14 +174,14 @@ function updateRotateHint() {
 
 // ================== KHỞI TẠO HỆ THỐNG XOAY ==================
 export function initRotateOrientation(
-    game: Phaser.Game,
+    
     options: {
         audio: HowlerAudioManager; // ✅ bắt buộc truyền vào
         overlaySceneKey?: string | null; // giữ cho tương thích nếu bạn còn dùng chỗ khác
         mainSceneKey?: string; // giữ cho tương thích nếu bạn còn dùng chỗ khác
     }
 ) {
-    gameRef = game;
+    // gameRef = game;
     audioRef = options.audio;
 
     ensureRotateOverlay();

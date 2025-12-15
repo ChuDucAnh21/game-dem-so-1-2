@@ -363,7 +363,7 @@ export class QuantityScene extends Phaser.Scene {
         this.state = 'playing';
 
         this.showCurrentLevel();
-        initRotateOrientation(this.game, { audio: this.audio });
+        initRotateOrientation({ audio: this.audio });
 
         // Kích hoạt âm sau thao tác người dùng (bắt buộc với iOS + HTML5 audio)
         this.input.once('pointerdown', async () => {
