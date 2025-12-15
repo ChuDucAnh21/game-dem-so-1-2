@@ -8,8 +8,10 @@ import { initRotateOrientation } from '../rotateOrientation';
 import { playVoiceLocked } from '../rotateOrientation';
 
 export class QuantityScene extends Phaser.Scene {
+    private audioReady = false; // ✅ thêm dòng này
     init(data: any) {
         if (data?.audio) this.audio = data.audio;
+        this.audioReady = !!data?.audioReady; // ✅ thêm dòng này
     }
     private audio!: HowlerAudioManager;
     // brush cho tô
@@ -98,7 +100,7 @@ export class QuantityScene extends Phaser.Scene {
                 paintGfx.clear();
 
                 // Tô full vòng với màu xanh lá
-                const radius = (circle.displayWidth / 2) * 0.92;
+                const radius = (circle.displayWidth / 2) * 0.93;
                 paintGfx.fillStyle(0x00c853, 0.95); // xanh lá tươi
                 paintGfx.fillCircle(circle.x, circle.y, radius);
             }
@@ -184,7 +186,7 @@ export class QuantityScene extends Phaser.Scene {
         }
 
         // ✅ play luôn (không chờ click)
-        this.audio.playBgm('bgm_quantity');
+        // this.audio.playBgm('bgm_quantity');
 
         // cho nút reload ngoài DOM bắn vào
         (window as any).quantityScene = this;
@@ -226,7 +228,7 @@ export class QuantityScene extends Phaser.Scene {
             | HTMLImageElement
             | HTMLCanvasElement;
 
-        const titleTargetWidth = this.getW() * 0.92; // chiếm ~85% chiều ngang
+        const titleTargetWidth = this.getW() * 0.93; // chiếm ~85% chiều ngang
         const titleScale = titleTargetWidth / titleTex.width;
         const scaleYFactor = 0.75; // <-- giảm chiều cao (0.6~0.85 tuỳ thích)
 
@@ -365,24 +367,30 @@ export class QuantityScene extends Phaser.Scene {
         this.showCurrentLevel();
         initRotateOrientation({ audio: this.audio });
 
-        // Kích hoạt âm sau thao tác người dùng (bắt buộc với iOS + HTML5 audio)
-        this.input.once('pointerdown', async () => {
-            await Promise.resolve(this.audio.unlock?.());
+        // ✅ Nếu audio đã sẵn sàng (từ EndGameScene “Chơi lại”) → không gắn click để phát lại prompt
+        if (!this.audioReady) {
+            // iOS/HTML5: cần gesture để unlock
+            this.input.once('pointerdown', async () => {
+                await Promise.resolve(this.audio.unlock?.());
 
-            // Nếu đang portrait (overlay xoay đang cần) -> CHỈ phát voice xoay, KHÔNG BGM
-            const shouldShowRotate =
-                window.innerHeight > window.innerWidth &&
-                window.innerWidth < 768;
-            if (shouldShowRotate) {
-                // playVoiceLocked(this.audio, 'voice_rotate');
-                return;
-            }
+                const shouldShowRotate =
+                    window.innerHeight > window.innerWidth &&
+                    window.innerWidth < 768;
 
-            // Nếu đã ngang rồi -> lúc này mới play BGM + prompt
+                if (shouldShowRotate) {
+                    playVoiceLocked(this.audio, 'voice_rotate');
+                    return;
+                }
+
+                // BGM + prompt chỉ phát ở lần click unlock này
+                this.audio.playBgm('bgm_quantity');
+                const lvl = this.levels[this.currentLevelIndex];
+                this.playPromptForLevel(lvl);
+            });
+        } else {
+            // ✅ đã unlock rồi → vào game là chạy luôn đúng 1 lần, và click sau đó không phát lại
             this.audio.playBgm('bgm_quantity');
-            const lvl = this.levels[this.currentLevelIndex];
-            this.playPromptForLevel(lvl);
-        });
+        }
 
         showGameButtons();
     }
@@ -758,7 +766,7 @@ export class QuantityScene extends Phaser.Scene {
             maskGfx.fillCircle(
                 circle.x,
                 circle.y,
-                (circle.displayWidth / 2) * 0.92
+                (circle.displayWidth / 2) * 0.93
             );
 
             const circleMask = maskGfx.createGeometryMask();
@@ -1039,7 +1047,7 @@ export class QuantityScene extends Phaser.Scene {
             // ✅ Hiển thị icon đúng ở góc panel
             this.showCheckIcon(true);
             this.playCorrectFeedback(level);
-            // this.audio.play('correct_quantity_1', { volume: 0.9 });
+            this.audio.play('correct_quantity_1', { volume: 0.9 });
         } else {
             // ❌ Hiển thị icon sai ở góc panel
             this.showCheckIcon(false);

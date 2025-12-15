@@ -115,7 +115,10 @@ export class EndGameScene extends Phaser.Scene {
             this.clearDimBackground();
             this.stopConfetti();
             this.scene.stop('EndGameScene');
-            this.scene.start('QuantityScene'); // QuantityScene sẽ tự random level lại
+          this.scene.start('QuantityScene', {
+  audio: this.audio,
+  audioReady: true, // ✅ báo trước: audio đã sẵn sàng
+});
         });
 
         // Nút Thoát (tùy bạn xử lý gì)
