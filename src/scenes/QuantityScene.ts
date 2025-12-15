@@ -7,7 +7,6 @@ import { QUANTITY_SOUNDS, QUANTITY_IMAGES } from '../assets/quantityAssets';
 import { initRotateOrientation } from '../rotateOrientation';
 import { playVoiceLocked } from '../rotateOrientation';
 
-
 export class QuantityScene extends Phaser.Scene {
     init(data: any) {
         if (data?.audio) this.audio = data.audio;
@@ -159,7 +158,6 @@ export class QuantityScene extends Phaser.Scene {
             this.hintFinger = undefined;
         }
     }
-    
 
     // ========= Preload =========
 
@@ -183,10 +181,7 @@ export class QuantityScene extends Phaser.Scene {
 
         if (!this.audio) {
             this.audio = new HowlerAudioManager(QUANTITY_SOUNDS);
-
         }
-
-        
 
         // ✅ play luôn (không chờ click)
         this.audio.playBgm('bgm_quantity');
@@ -210,7 +205,6 @@ export class QuantityScene extends Phaser.Scene {
                 "url('assets/images/bg/bg_lake.png')";
             this.bgLayerB.classList.remove('visible');
         }
-
 
         // Bé
         this.avata_child = this.add
@@ -370,9 +364,28 @@ export class QuantityScene extends Phaser.Scene {
 
         this.showCurrentLevel();
         initRotateOrientation(this.game, { audio: this.audio });
+
+        // Kích hoạt âm sau thao tác người dùng (bắt buộc với iOS + HTML5 audio)
+        this.input.once('pointerdown', async () => {
+            await Promise.resolve(this.audio.unlock?.());
+
+            // Nếu đang portrait (overlay xoay đang cần) -> CHỈ phát voice xoay, KHÔNG BGM
+            const shouldShowRotate =
+                window.innerHeight > window.innerWidth &&
+                window.innerWidth < 768;
+            if (shouldShowRotate) {
+                playVoiceLocked(this.audio, 'voice_rotate');
+                return;
+            }
+
+            // Nếu đã ngang rồi -> lúc này mới play BGM + prompt
+            this.audio.playBgm('bgm_quantity');
+            const lvl = this.levels[this.currentLevelIndex];
+            this.playPromptForLevel(lvl);
+        });
+
         showGameButtons();
     }
- 
 
     private updateObjectsPanel() {
         const centerX = this.pctX(0.5);
@@ -471,7 +484,6 @@ export class QuantityScene extends Phaser.Scene {
     private clearObjectsAndCircles() {
         this.objectSprites.forEach((s) => s.destroy());
         this.circleSprites.forEach((s) => s.destroy());
-       
 
         this.objectSprites = [];
         this.circleSprites = [];
@@ -740,7 +752,6 @@ export class QuantityScene extends Phaser.Scene {
             const paintGfx = this.add.graphics().setDepth(3); // TRÊN vòng tròn
             paintGfx.setScrollFactor(0);
 
-            
             // 4) Tạo mask hình tròn cho paintGfx
             const maskGfx = this.make.graphics({ x: 0, y: 0 }, false);
             maskGfx.fillStyle(0xffffff);
@@ -1146,7 +1157,7 @@ export class QuantityScene extends Phaser.Scene {
         }
     }
 
-    private  showResultScreen() {
+    private showResultScreen() {
         this.state = 'result';
 
         this.clearObjectsAndCircles();
@@ -1164,10 +1175,6 @@ export class QuantityScene extends Phaser.Scene {
         // 👉 clear luôn hint nếu còn
         this.hidePaintHint();
     }
-    
-    
-   
-    
 
     restartGame() {
         this.stopAllVoices();
@@ -1209,8 +1216,4 @@ export class QuantityScene extends Phaser.Scene {
         this.clearObjectsAndCircles();
         this.showCurrentLevel();
     }
-    
-
-    
-
 }

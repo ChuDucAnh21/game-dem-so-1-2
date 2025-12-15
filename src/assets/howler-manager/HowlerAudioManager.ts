@@ -3,6 +3,7 @@ import type { HowlerSoundDef } from "../quantityAssets";
 
 export class HowlerAudioManager {
   private sounds = new Map<string, Howl>();
+
    stopAll() {
     Howler.stop();
   }
@@ -24,7 +25,7 @@ export class HowlerAudioManager {
           loop: !!def.loop,
           volume: def.volume ?? 1,
           preload: true,
-        
+          html5: def.html5 === true ,
         })
       );
     }

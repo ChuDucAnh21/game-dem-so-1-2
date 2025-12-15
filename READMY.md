@@ -332,5 +332,13 @@ Trong `QuantityScene` có thể chỉnh:
   - Nhạc nền và hiệu ứng sống động
 ---
 
+## 9. Lưu ý âm thanh (iOS/Howler)
+
+- **HowlerAudioManager**: chỉ bật `html5` cho âm thanh **không loop** (prompt/sfx ngắn) để tránh giật khi lặp trên iOS. BGM (`bgm_quantity`) nên để Web Audio để loop mượt.
+- **Thiết lập asset**: trong `quantityAssets.ts` giữ `html5: true` cho prompt/sfx; bỏ `html5` cho BGM. Nếu ép BGM `html5`, chấp nhận khả năng giật khi lặp.
+- **Unlock bằng thao tác chạm**: trong `QuantityScene.create()` lắng nghe `this.input.once('pointerdown', ...)` rồi gọi `this.audio.unlock(); this.audio.playBgm('bgm_quantity'); this.playPromptForLevel(level);` để Safari/iOS cho phép phát âm sau lần chạm đầu tiên.
+- **Mute switch**: HTML5 Audio vẫn phát khi gạt mute; Web Audio sẽ tắt. Chỉ bật `html5` cho BGM nếu ưu tiên vượt mute hơn việc loop mượt.
+---
+
 ### Có thể nhân bản game ra để làm game đếm số lương 3-10 ###
 --- 
