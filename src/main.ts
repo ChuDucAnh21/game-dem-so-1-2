@@ -118,6 +118,9 @@ function scheduleUpdateUIButtonScale() {
 }
 
 scheduleUpdateUIButtonScale();
+document.getElementById('btn-reset')?.addEventListener('click', () => {
+    window.compareScene?.restartGame();
+});
 window.addEventListener("resize", scheduleUpdateUIButtonScale);
 window.addEventListener("orientationchange", scheduleUpdateUIButtonScale);
 window.visualViewport?.addEventListener("resize", scheduleUpdateUIButtonScale);
