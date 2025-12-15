@@ -96,7 +96,7 @@ export class QuantityScene extends Phaser.Scene {
                 paintGfx.clear();
 
                 // Tô full vòng với màu xanh lá
-                const radius = (circle.displayWidth / 2) * 0.9;
+                const radius = (circle.displayWidth / 2) * 0.998;
                 paintGfx.fillStyle(0x00c853, 0.95); // xanh lá tươi
                 paintGfx.fillCircle(circle.x, circle.y, radius);
             }
