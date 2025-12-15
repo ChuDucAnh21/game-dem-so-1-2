@@ -174,9 +174,13 @@ function updateRotateHint() {
             bgmStarted = true;
         }
 
+        // ✅ Chỉ phát lại pending prompt khi đã unlock (sau click đầu tiên)
+        // ✅ Nếu chưa unlock thì GIỮ pending lại, không phát tự động (tránh hên xui + tránh double)
         if (pendingQuestionKey) {
-            playVoiceLocked(audioRef, pendingQuestionKey);
-            pendingQuestionKey = null;
+            if (audioUnlockedByUser) {
+                playVoiceLocked(audioRef, pendingQuestionKey);
+                pendingQuestionKey = null;
+            }
         }
     }
 }

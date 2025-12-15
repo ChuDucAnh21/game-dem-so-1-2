@@ -44,6 +44,8 @@ export class QuantityScene extends Phaser.Scene {
     // ✅ icon check đúng/sai
     private checkIcon?: Phaser.GameObjects.Image;
 
+    private initialPromptPlayed = false;
+
     // objects & circles
     private objectSprites: Phaser.GameObjects.Image[] = [];
     private circleSprites: Phaser.GameObjects.Image[] = [];
@@ -173,6 +175,7 @@ export class QuantityScene extends Phaser.Scene {
     // ========= Create =========
 
     async create() {
+        
         // chờ font load
         await (document as any).fonts?.ready;
 
@@ -369,28 +372,35 @@ export class QuantityScene extends Phaser.Scene {
 
         // ✅ Nếu audio đã sẵn sàng (từ EndGameScene “Chơi lại”) → không gắn click để phát lại prompt
         if (!this.audioReady) {
-            // iOS/HTML5: cần gesture để unlock
-            this.input.once('pointerdown', async () => {
-                await Promise.resolve(this.audio.unlock?.());
+    this.input.once('pointerdown', async () => {
+        await Promise.resolve(this.audio.unlock?.());
 
-                const shouldShowRotate =
-                    window.innerHeight > window.innerWidth &&
-                    window.innerWidth < 768;
+        const shouldShowRotate =
+            window.innerHeight > window.innerWidth &&
+            window.innerWidth < 768;
 
-                if (shouldShowRotate) {
-                    playVoiceLocked(this.audio, 'voice_rotate');
-                    return;
-                }
-
-                // BGM + prompt chỉ phát ở lần click unlock này
-                this.audio.playBgm('bgm_quantity');
-                const lvl = this.levels[this.currentLevelIndex];
-                this.playPromptForLevel(lvl);
-            });
-        } else {
-            // ✅ đã unlock rồi → vào game là chạy luôn đúng 1 lần, và click sau đó không phát lại
-            this.audio.playBgm('bgm_quantity');
+        if (shouldShowRotate) {
+            playVoiceLocked(this.audio, 'voice_rotate');
+            return;
         }
+
+        // ✅ BGM luôn phát sau unlock
+        this.audio.playBgm('bgm_quantity');
+
+        // ✅ Prompt chỉ phát đúng 1 lần
+        if (!this.initialPromptPlayed) {
+            this.initialPromptPlayed = true;
+            const lvl = this.levels[this.currentLevelIndex];
+            this.playPromptForLevel(lvl);
+        }
+
+        // ✅ sau unlock thì coi như audioReady
+        this.audioReady = true;
+    });
+} else {
+    this.audio.playBgm('bgm_quantity');
+}
+
 
         showGameButtons();
     }
@@ -485,7 +495,11 @@ export class QuantityScene extends Phaser.Scene {
         this.drawObjects(level);
         this.drawCircles(level);
 
-        this.playPromptForLevel(level);
+        // ✅ Chỉ auto phát prompt khi audioReady (tức đã unlock từ trước)
+        // ✅ Nếu chưa unlock: prompt sẽ chỉ phát trong pointerdown unlock (1 lần)
+        if (this.audioReady) {
+            this.playPromptForLevel(level);
+        }
         this.animateLevelIntro();
     }
 
