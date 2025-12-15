@@ -53,9 +53,16 @@ export class EndGameScene extends Phaser.Scene {
 
         // Phát âm thanh chiến thắng sau 2s
         this.time.delayedCall(2000, () => {
-            this.audio.play('fireworks');
-            this.audio.play('applause');
-        });
+
+
+  // ✅ iOS: đừng bắn 2 cái cùng lúc, cho lệch nhau chút
+  this.audio.play('fireworks', { stopSame: true, volume: 0.8 });
+
+  this.time.delayedCall(250, () => {
+    this.audio.play('applause', { stopSame: true, volume: 0.8 });
+  });
+});
+
 
         // ==== Banner kết quả (ảnh nền) ====
         this.add
