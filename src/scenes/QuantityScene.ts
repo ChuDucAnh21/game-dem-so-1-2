@@ -1047,7 +1047,7 @@ export class QuantityScene extends Phaser.Scene {
             // ✅ Hiển thị icon đúng ở góc panel
             this.showCheckIcon(true);
             this.playCorrectFeedback(level);
-            this.audio.play('correct_quantity_1', { volume: 0.9 });
+            // this.audio.play('correct_quantity_1', { volume: 0.9 });
         } else {
             // ❌ Hiển thị icon sai ở góc panel
             this.showCheckIcon(false);

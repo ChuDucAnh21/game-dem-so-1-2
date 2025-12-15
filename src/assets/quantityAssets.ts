@@ -38,7 +38,7 @@ export const QUANTITY_SOUNDS: Record<string, HowlerSoundDef> = {
   "sfx-click":   { src: "assets/audio/sfx/click.mp3",   volume: 0.2 , html5: true},
   "complete":   { src: 'assets/audio/sfx/complete.mp3', volume: 1.0 , html5: true},
   "fireworks":   { src: 'assets/audio/sfx/fireworks.mp3', loop: true,  volume: 0.2, html5: true },
-  "applause":   { src: 'assets/audio/sfx/click.mp3',   volume: 0.2, html5: true },
+  "applause":   { src: 'assets/audio/sfx/applause.mp3', loop: true,  volume: 0.2, html5: true },
 
   //hướng dẫn (prompt)
   "prompt_quantity_1": { src: "assets/audio/prompt/prompt_draw_hustle.mp3", volume: 1.0, html5: true },

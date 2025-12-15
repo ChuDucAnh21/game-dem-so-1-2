@@ -1,4 +1,3 @@
-
 import type { HowlerAudioManager } from './assets/howler-manager/HowlerAudioManager'; // <-- sửa path đúng theo dự án bạn
 
 // ================== STATE CHUNG ==================
@@ -16,6 +15,9 @@ let pendingQuestionKey: string | null = null;
 
 let lastRotateVoiceTime = 0;
 const ROTATE_VOICE_COOLDOWN = 1500; // ms
+
+let audioUnlockedByUser = false; // ✅ tap 1 lần là unlock, các lần sau auto play
+let rotateInited = false; // ✅ tránh addEventListener nhiều lần (nếu bạn init nhiều scene)
 
 // ================== ƯU TIÊN VOICE ==================
 function getVoicePriority(key: string): number {
@@ -135,23 +137,17 @@ function updateRotateHint() {
     if (!audioRef) return;
 
     if (overlayTurnedOn) {
-        // ✅ Lưu lại voice đang chạy (hướng dẫn tô / câu hỏi) để xoay xong phát lại
-        // (đừng lưu voice_rotate)
         if (currentVoiceKey && currentVoiceKey !== 'voice_rotate') {
             pendingQuestionKey = currentVoiceKey;
         }
 
-        // ✅ Đừng reset pendingQuestionKey ở đây nữa (đây là bug của bạn)
-        // pendingQuestionKey = null;
-
-        // Khi bắt xoay: dừng hết để chỉ còn bgm + (có thể) voice_rotate
         audioRef.stopAllExceptBgm('bgm_quantity');
-
-        // reset state hiện tại
         currentVoiceKey = null;
 
-        // Nếu bạn muốn auto nhắc xoay thì để; nếu không muốn chồng tiếng thì chỉ phát khi tap (pointerdown)
-        // tryPlayRotateVoice();
+        // ✅ Nếu đã từng tap unlock rồi -> auto nhắc xoay ngay khi bị xoay dọc lại
+        if (audioUnlockedByUser) {
+            tryPlayRotateVoice();
+        }
     }
 
     if (overlayTurnedOff) {
@@ -173,26 +169,27 @@ function updateRotateHint() {
 }
 
 // ================== KHỞI TẠO HỆ THỐNG XOAY ==================
-export function initRotateOrientation(
-    
-    options: {
-        audio: HowlerAudioManager; // ✅ bắt buộc truyền vào
-        overlaySceneKey?: string | null; // giữ cho tương thích nếu bạn còn dùng chỗ khác
-        mainSceneKey?: string; // giữ cho tương thích nếu bạn còn dùng chỗ khác
-    }
-) {
-    // gameRef = game;
+export function initRotateOrientation(options: {
+    audio: HowlerAudioManager;
+    overlaySceneKey?: string | null;
+    mainSceneKey?: string;
+}) {
     audioRef = options.audio;
 
     ensureRotateOverlay();
     updateRotateHint();
 
+    if (rotateInited) return; // ✅ tránh add listener nhiều lần
+    rotateInited = true;
+
     window.addEventListener('resize', updateRotateHint);
     window.addEventListener('orientationchange', updateRotateHint as any);
 
-    // ✅ Quan trọng cho iOS: gesture thật để phát được âm
+    // ✅ Lần đầu cần tap để iOS cho phép phát âm thanh
     window.addEventListener('pointerdown', () => {
         if (!isRotateOverlayActive) return;
-        tryPlayRotateVoice();
+
+        audioUnlockedByUser = true;     // ✅ unlock vĩnh viễn cho các lần sau
+        tryPlayRotateVoice();           // ✅ tap lần đầu sẽ phát voice_rotate
     });
 }
