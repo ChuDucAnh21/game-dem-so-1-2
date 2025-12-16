@@ -230,7 +230,7 @@ export class QuantityScene extends Phaser.Scene {
             | HTMLImageElement
             | HTMLCanvasElement;
 
-        const titleTargetWidth = this.getW() * 0.93; // chiếm ~85% chiều ngang
+        const titleTargetWidth = this.getW() * 0.83; // chiếm ~85% chiều ngang
         const titleScale = titleTargetWidth / titleTex.width;
         const scaleYFactor = 0.75; // <-- giảm chiều cao (0.6~0.85 tuỳ thích)
 
@@ -245,7 +245,7 @@ export class QuantityScene extends Phaser.Scene {
             .text(
                 Math.round(this.titleBanner.x),
                 Math.round(this.titleBanner.y),
-                'BÉ ĐẾM SỐ LƯỢNG ĐỒ VẬT VÀ TÔ SỐ VÒNG TƯƠNG ỨNG',
+                'BÉ ĐẾM SỐ ĐỒ VẬT VÀ TÔ SỐ VÒNG TƯƠNG ỨNG',
                 {
                     fontFamily: '"Baloo 2", sans-serif',
                     fontSize: `${Math.round(this.getH() * 0.054)}px`,
