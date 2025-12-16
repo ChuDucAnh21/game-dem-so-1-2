@@ -51,9 +51,9 @@ async function ensureFontsReady() {
 }
 window.addEventListener("load", async () => {
   await ensureFontsReady();
-//   new Phaser.Game(config);
 });
  const game = new Phaser.Game(config);
+ 
 (window as any).__game = game; // ✅ expose game
  //-------------
 function applySafeVh() {

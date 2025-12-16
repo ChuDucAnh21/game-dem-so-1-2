@@ -40,7 +40,7 @@ export class QuantityScene extends Phaser.Scene {
     };
 
     // UI
-    // private titleText!: Phaser.GameObjects.Text;
+   
     private doneButton!: Phaser.GameObjects.Container;
     private titleBanner!: Phaser.GameObjects.Image;
     // ✅ icon check đúng/sai
@@ -189,8 +189,6 @@ export class QuantityScene extends Phaser.Scene {
             this.audio = new HowlerAudioManager(QUANTITY_SOUNDS);
         }
 
-        // ✅ play luôn (không chờ click)
-        // this.audio.playBgm('bgm_quantity');
 
         // cho nút reload ngoài DOM bắn vào
         (window as any).quantityScene = this;
@@ -483,7 +481,7 @@ if (this.forcePrompt && this.audioReady) {
     private playPromptForLevel(level: CountLevel) {
         if (!level.promptKey) return;
         this.audio.playPrompt(level.promptKey);
-        // playVoiceLocked(this.audio, level.promptKey);
+       
     }
 
     // ========= Show level =========
@@ -927,32 +925,7 @@ if (this.forcePrompt && this.audioReady) {
         return ratio;
     }
 
-    // private onCircleClicked(circle: Phaser.GameObjects.Image) {
-    //     if (this.state === 'result') return;
-
-    //     this.audio.play('sfx-click');
-
-    //     const filled = circle.getData('filled') as boolean;
-    //     const newFilled = !filled;
-    //     circle.setData('filled', newFilled);
-
-    //     const baseScaleX = (circle as any).baseScaleX || circle.scaleX;
-    //     const baseScaleY = (circle as any).baseScaleY || circle.scaleY;
-
-    //     circle.setTexture(newFilled ? 'circle_filled' : 'circle_empty');
-
-    //     const targetScaleX = newFilled ? baseScaleX * 1.2 : baseScaleX;
-    //     const targetScaleY = newFilled ? baseScaleY * 1.2 : baseScaleY;
-
-    //     this.tweens.add({
-    //         targets: circle,
-    //         scaleX: targetScaleX,
-    //         scaleY: targetScaleY,
-    //         duration: 120,
-    //         ease: 'Back.out',
-    //     });
-    // }
-
+    
     private animateLevelIntro() {
         const allTargets: Phaser.GameObjects.Image[] = [
             ...this.objectSprites,
