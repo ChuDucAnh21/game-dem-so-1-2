@@ -1,7 +1,7 @@
 // src/game/quantity/quantityTypes.ts
 export type CountLevel = {
   id: number;
-  number: 1|2;
+  number: 5;
   title: string;
   name: string;
   objectIcon: string[];

@@ -5,33 +5,16 @@ export function buildQuantityLevels(): CountLevel[] {
   return [
     {
       id: 1,
-      number: 1,
-      title: 'SỐ LƯỢNG 1',
-      name: 'con lật đật',
-      objectIcon: ['hustle'],
-      objectCount: 1,
+      number: 5,
+      title: 'SỐ LƯỢNG 5',
+      name: 'cây nến',
+      objectIcon: ['candle'],
+      objectCount: 5,
       maxCircles: 4,
       promptKey: 'prompt_quantity_1',
       correctVoiceKey: 'correct_quantity_1',
-      correctDrawVoiceKey: 'correct_draw_hustle',
+      correctDrawVoiceKey: 'correct_draw_candle',
     },
-    {
-      id: 2,
-      number: 2,
-      title: 'SỐ LƯỢNG 2',
-      name: 'quả bóng bay',
-      objectIcon: [
-        'balloon',
-        'balloon1',
-        'balloon2',
-        'balloon3',
-        'balloon4',
-      ],
-      objectCount: 2,
-      maxCircles: 4,
-      promptKey: 'prompt_quantity_2',
-      correctVoiceKey: 'correct_quantity_1',
-      correctDrawVoiceKey: 'correct_draw_ballon',
-    },
+    
   ]
 }

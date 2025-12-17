@@ -8,15 +8,9 @@ export const QUANTITY_IMAGES: AssetItem[] = [
   // bé
   { key: 'avata_child', url: 'assets/images/characters/avata_child.png' },
 
-  // bóng bay
-  { key: 'balloon',  url: 'assets/images/animals/ballon_BLUE.png' },
-  { key: 'balloon1', url: 'assets/images/animals/ballon_GREEN.png' },
-  { key: 'balloon2', url: 'assets/images/animals/ballon_PURPLE.png' },
-  { key: 'balloon3', url: 'assets/images/animals/ballon_RED.png' },
-  { key: 'balloon4', url: 'assets/images/animals/ballon_YELLOW.png' },
 
-  // lật đật
-  { key: 'hustle', url: 'assets/images/animals/hustle.png' },
+  // cây nến
+  { key: 'candle', url: 'assets/images/animals/candle.png' },
 
   
 
@@ -41,13 +35,11 @@ export const QUANTITY_SOUNDS: Record<string, HowlerSoundDef> = {
   "applause":   { src: 'assets/audio/sfx/applause.mp3', loop: true,  volume: 0.2, html5: true },
 
   //hướng dẫn (prompt)
-  "prompt_quantity_1": { src: "assets/audio/prompt/prompt_draw_hustle.mp3", volume: 1.0, html5: true },
-  "prompt_quantity_2": { src: "assets/audio/prompt/prompt_draw_ballon.mp3", volume: 1.0, html5: true},
+  "prompt_quantity_1": { src: "assets/audio/prompt/prompt_draw_candle.mp3", volume: 1.0, html5: true },
    "voice_rotate": { src: "assets/audio/prompt/voice_rotate.mp3", volume: 1.0, html5: true},
 
   //khen
-  "correct_quantity_1": { src: "assets/audio/sfx/correct_answer.mp3", volume: 0.9, html5: true },
-  "correct_quantity_2": { src: "assets/audio/sfx/correct_answer.mp3", volume: 0.9 , html5: true},
+  "correct_quantity_1": { src: "assets/audio/sfx/correct_answer-4.mp3", volume: 0.9, html5: true },
 
   // đúng khi tô
   "correct_draw_ballon": { src: "assets/audio/sfx/correct_draw_ballon.mp3", volume: 1.0 , html5: true},
@@ -56,6 +48,9 @@ export const QUANTITY_SOUNDS: Record<string, HowlerSoundDef> = {
   //đếm số
   "count_1": { src: "assets/audio/count/number_one.mp3",   volume: 1.0 , html5: true},
   "count_2": { src: "assets/audio/count/number_two.mp3",   volume: 1.0, html5: true },
+  "count_3": { src: "assets/audio/count/number_three.mp3",   volume: 1.0, html5: true },
+  "count_4": { src: "assets/audio/count/number_four.mp3",   volume: 1.0, html5: true },
+  "count_5": { src: "assets/audio/count/number_five.mp3",   volume: 1.0, html5: true },
 
   //khác
   "voice_try_again": { src: "assets/audio/prompt/retry_draw.mp3", volume: 1.0 , html5: true},

@@ -6,6 +6,7 @@ import { HowlerAudioManager } from '../assets/howler-manager/HowlerAudioManager'
 import { QUANTITY_SOUNDS, QUANTITY_IMAGES } from '../assets/quantityAssets';
 import { initRotateOrientation } from '../rotateOrientation';
 import { playVoiceLocked } from '../rotateOrientation';
+import { CircleCheckOverlay } from '../components/game/CircleCheckOverlay';
 
 export class QuantityScene extends Phaser.Scene {
     private audioReady = false; // ✅ thêm dòng này
@@ -13,13 +14,13 @@ export class QuantityScene extends Phaser.Scene {
     init(data: any) {
         if (data?.audio) this.audio = data.audio;
         this.audioReady = !!data?.audioReady; // ✅ thêm dòng này
-         this.forcePrompt = !!data?.forcePrompt;
+        this.forcePrompt = !!data?.forcePrompt;
     }
     private audio!: HowlerAudioManager;
     // brush cho tô
     private brushRadius = 24; // to hơn cho dễ tô tròn
 
-    private brushColor = 0x1b9cff; // xanh dương cho bé
+    private brushColor = 0xb388ff; // xanh dương cho bé
     private fillThreshold = 0.9; // 60% là đạt (dễ thở hơn)
     private paintGridSize = 10; // lưới 16x16 điểm mẫu cho mỗi vòng
 
@@ -35,12 +36,14 @@ export class QuantityScene extends Phaser.Scene {
     private isBgAActive = true;
 
     private bgByIcon: Record<string, string> = {
-        hustle: 'assets/images/bg/bg_home.jpg',
-        balloon: 'assets/images/bg/bg_lake.jpg',
+        candle: 'assets/images/bg/bg_garden.jpg',
     };
 
+    //màn hình khoanh
+    private circleOverlay!: CircleCheckOverlay;
+
     // UI
-   
+
     private doneButton!: Phaser.GameObjects.Container;
     private titleBanner!: Phaser.GameObjects.Image;
     // ✅ icon check đúng/sai
@@ -189,6 +192,8 @@ export class QuantityScene extends Phaser.Scene {
             this.audio = new HowlerAudioManager(QUANTITY_SOUNDS);
         }
 
+        this.circleOverlay = new CircleCheckOverlay(this, this.audio);
+        this.circleOverlay.init();
 
         // cho nút reload ngoài DOM bắn vào
         (window as any).quantityScene = this;
@@ -212,7 +217,7 @@ export class QuantityScene extends Phaser.Scene {
 
         // Bé
         this.avata_child = this.add
-            .image(this.pctX(0), this.pctY(0.75), 'avata_child')
+            .image(this.pctX(0), this.pctY(0.65), 'avata_child')
             .setOrigin(0, 1);
         this.avata_child.setScale(0.5);
         this.tweens.add({
@@ -230,7 +235,7 @@ export class QuantityScene extends Phaser.Scene {
             | HTMLImageElement
             | HTMLCanvasElement;
 
-        const titleTargetWidth = this.getW() * 0.80; // chiếm ~85% chiều ngang
+        const titleTargetWidth = this.getW() * 0.8; // chiếm ~85% chiều ngang
         const titleScale = titleTargetWidth / titleTex.width;
         const scaleYFactor = 0.75; // <-- giảm chiều cao (0.6~0.85 tuỳ thích)
 
@@ -280,7 +285,7 @@ export class QuantityScene extends Phaser.Scene {
             24
         );
 
-        const btnLabel = this.add.text(0, 0, 'HOÀN THÀNH', {
+        const btnLabel = this.add.text(0, 0, 'KIỂM TRA', {
             fontFamily: '"Baloo 2", sans-serif',
             fontSize: `${Math.round(this.getH() * 0.044)}px`,
             color: '#ffffff', // chữ trắng
@@ -402,13 +407,12 @@ export class QuantityScene extends Phaser.Scene {
 
         showGameButtons();
         // ✅ nếu được yêu cầu force prompt (reset) thì phát lại prompt level 0
-if (this.forcePrompt && this.audioReady) {
-  this.time.delayedCall(0, () => {
-    const lvl = this.levels[this.currentLevelIndex];
-    this.playPromptForLevel(lvl);
-  });
-}
-
+        if (this.forcePrompt && this.audioReady) {
+            this.time.delayedCall(0, () => {
+                const lvl = this.levels[this.currentLevelIndex];
+                this.playPromptForLevel(lvl);
+            });
+        }
     }
 
     private updateObjectsPanel() {
@@ -481,7 +485,6 @@ if (this.forcePrompt && this.audioReady) {
     private playPromptForLevel(level: CountLevel) {
         if (!level.promptKey) return;
         this.audio.playPrompt(level.promptKey);
-       
     }
 
     // ========= Show level =========
@@ -759,8 +762,18 @@ if (this.forcePrompt && this.audioReady) {
             | HTMLImageElement
             | HTMLCanvasElement;
 
-        const maxCircleWidth = areaWidth / (maxCircles + 2);
-        const circleScale = (maxCircleWidth * 0.95) / tex.width;
+        // ✅ GIỮ SIZE VÒNG NHƯ LÚC 7 VÒNG
+        const referenceCircles = 7;
+        const refMaxCircleWidth = areaWidth / (referenceCircles + 2);
+        let circleScale = (refMaxCircleWidth * 0.95) / tex.width;
+
+        // ✅ spacing nhỏ lại để nhét 10 vòng (tăng hệ số 0.7 -> 0.9 cho rộng hơn)
+
+        // (tuỳ chọn) chống chồng lên nhau: nếu spacing nhỏ hơn đường kính vòng -> giảm scale chút xíu
+        const circleW = tex.width * circleScale;
+        if (spacing < circleW * 1.02) {
+            circleScale = spacing / (tex.width * 1.02);
+        }
 
         for (let i = 0; i < maxCircles; i++) {
             const x = startX + spacing * i;
@@ -925,7 +938,6 @@ if (this.forcePrompt && this.audioReady) {
         return ratio;
     }
 
-    
     private animateLevelIntro() {
         const allTargets: Phaser.GameObjects.Image[] = [
             ...this.objectSprites,
@@ -1071,9 +1083,32 @@ if (this.forcePrompt && this.audioReady) {
         if (hasAnyVoice) {
             playVoice(level.correctVoiceKey, () => {
                 playVoice(level.correctDrawVoiceKey, () => {
-                    this.playCountingSequence(level, () =>
-                        this.goToNextLevel()
-                    );
+                    this.playCountingSequence(level, () => {
+                        // khoá game ở trạng thái checking trong lúc overlay chạy
+                        this.state = 'checking';
+
+                        // tạo đúng 14 item (có thể random từ iconPool của level)
+                        const iconPool =
+                            level.objectIcon && level.objectIcon.length > 0
+                                ? level.objectIcon
+                                : ['hustle'];
+
+                        const items = Array.from({ length: 14 }, () => ({
+                            key: Phaser.Utils.Array.GetRandom(
+                                iconPool
+                            ) as string,
+                            scale: 0.32, // tuỳ chỉnh
+                        }));
+
+                        this.circleOverlay.show({
+                            expectedCount: level.objectCount,
+                            items,
+                            promptKey: 'voice_circle_hint',
+                            successKey: 'voice_congrats', // đổi key theo kho audio của bạn
+                            failKey: 'voice_try_again',
+                            onSuccess: () => this.goToNextLevel(),
+                        });
+                    });
                 });
             });
         } else {
